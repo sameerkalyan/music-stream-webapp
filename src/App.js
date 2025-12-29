@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './App.css';
+import React, { useState, useEffect, useRef } from "react";
+import "./App.css";
 
 function App() {
   const [songs, setSongs] = useState([]);
@@ -11,7 +11,7 @@ function App() {
   const [isMuted, setIsMuted] = useState(false);
   const [isRepeat, setIsRepeat] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState("dark");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [audioError, setAudioError] = useState(null);
@@ -21,44 +21,44 @@ function App() {
 
   // Load songs from JSON
   useEffect(() => {
-    fetch('/songs.json')
-      .then(response => response.json())
-      .then(data => {
+    fetch(`${process.env.PUBLIC_URL}/songs.json`)
+      .then((response) => response.json())
+      .then((data) => {
         setSongs(data);
         setLoading(false);
       })
-      .catch(err => {
-        setError('Failed to load songs');
+      .catch((err) => {
+        setError("Failed to load songs");
         setLoading(false);
       });
   }, []);
 
   // Get play count for a song
   const getPlayCount = (songId) => {
-    const counts = JSON.parse(localStorage.getItem('playCounts') || '{}');
+    const counts = JSON.parse(localStorage.getItem("playCounts") || "{}");
     return counts[songId] || 0;
   };
 
   // Save play count
   const incrementPlayCount = (songId) => {
-    const counts = JSON.parse(localStorage.getItem('playCounts') || '{}');
+    const counts = JSON.parse(localStorage.getItem("playCounts") || "{}");
     counts[songId] = (counts[songId] || 0) + 1;
-    localStorage.setItem('playCounts', JSON.stringify(counts));
+    localStorage.setItem("playCounts", JSON.stringify(counts));
   };
 
   // Load theme from localStorage
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'dark';
+    const savedTheme = localStorage.getItem("theme") || "dark";
     setTheme(savedTheme);
-    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.documentElement.setAttribute("data-theme", savedTheme);
   }, []);
 
   // Toggle theme
   const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.setAttribute("data-theme", newTheme);
   };
 
   // Audio event listeners
@@ -70,33 +70,37 @@ function App() {
     const updateDuration = () => setDuration(audio.duration);
     const handleEnded = () => handleNext();
     const handleError = (e) => {
-      console.error('Audio error:', e);
-      const errorMsg = audio.error ? `Error code: ${audio.error.code}` : 'Unknown error';
-      setAudioError(`Failed to load audio. ${errorMsg}. Check if files are accessible.`);
+      console.error("Audio error:", e);
+      const errorMsg = audio.error
+        ? `Error code: ${audio.error.code}`
+        : "Unknown error";
+      setAudioError(
+        `Failed to load audio. ${errorMsg}. Check if files are accessible.`
+      );
       setIsPlaying(false);
     };
     const handleCanPlay = () => {
       setAudioError(null);
-      console.log('Audio loaded successfully');
+      console.log("Audio loaded successfully");
     };
     const handleLoadStart = () => {
-      console.log('Loading audio from:', audio.currentSrc);
+      console.log("Loading audio from:", audio.currentSrc);
     };
 
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('loadedmetadata', updateDuration);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('error', handleError);
-    audio.addEventListener('canplay', handleCanPlay);
-    audio.addEventListener('loadstart', handleLoadStart);
+    audio.addEventListener("timeupdate", updateTime);
+    audio.addEventListener("loadedmetadata", updateDuration);
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("error", handleError);
+    audio.addEventListener("canplay", handleCanPlay);
+    audio.addEventListener("loadstart", handleLoadStart);
 
     return () => {
-      audio.removeEventListener('timeupdate', updateTime);
-      audio.removeEventListener('loadedmetadata', updateDuration);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('error', handleError);
-      audio.removeEventListener('canplay', handleCanPlay);
-      audio.removeEventListener('loadstart', handleLoadStart);
+      audio.removeEventListener("timeupdate", updateTime);
+      audio.removeEventListener("loadedmetadata", updateDuration);
+      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("error", handleError);
+      audio.removeEventListener("canplay", handleCanPlay);
+      audio.removeEventListener("loadstart", handleLoadStart);
     };
   }, [currentSongIndex, isRepeat, isShuffle, songs]);
 
@@ -116,9 +120,9 @@ function App() {
               incrementPlayCount(songs[currentSongIndex].id);
             }
           })
-          .catch(err => {
-            console.error('Playback failed:', err);
-            setAudioError('Playback failed. Try clicking play again.');
+          .catch((err) => {
+            console.error("Playback failed:", err);
+            setAudioError("Playback failed. Try clicking play again.");
             setIsPlaying(false);
           });
       }
@@ -150,7 +154,8 @@ function App() {
     if (currentTime > 3) {
       audioRef.current.currentTime = 0;
     } else {
-      const prevIndex = currentSongIndex === 0 ? songs.length - 1 : currentSongIndex - 1;
+      const prevIndex =
+        currentSongIndex === 0 ? songs.length - 1 : currentSongIndex - 1;
       setCurrentSongIndex(prevIndex);
       setIsPlaying(true);
       setCurrentTime(0);
@@ -189,10 +194,10 @@ function App() {
 
   // Format time
   const formatTime = (time) => {
-    if (isNaN(time)) return '0:00';
+    if (isNaN(time)) return "0:00";
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
   // Play specific song
@@ -210,8 +215,8 @@ function App() {
       if (isPlaying) {
         const playPromise = audioRef.current.play();
         if (playPromise !== undefined) {
-          playPromise.catch(err => {
-            console.error('Auto-play error:', err);
+          playPromise.catch((err) => {
+            console.error("Auto-play error:", err);
             setIsPlaying(false);
           });
         }
@@ -228,7 +233,11 @@ function App() {
   }
 
   if (songs.length === 0) {
-    return <div className="error">No songs available. Please add songs to songs.json</div>;
+    return (
+      <div className="error">
+        No songs available. Please add songs to songs.json
+      </div>
+    );
   }
 
   const currentSong = songs[currentSongIndex];
@@ -239,7 +248,7 @@ function App() {
       <header className="header">
         <h1>Warduna Trayaksha</h1>
         <button className="theme-toggle" onClick={toggleTheme}>
-          {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+          {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
         </button>
       </header>
 
@@ -247,15 +256,17 @@ function App() {
       <main className="playlist">
         <h2>Tracks</h2>
         {audioError && (
-          <div style={{
-            padding: '12px',
-            marginBottom: '16px',
-            backgroundColor: 'rgba(255, 68, 68, 0.1)',
-            border: '1px solid rgba(255, 68, 68, 0.3)',
-            borderRadius: '8px',
-            color: '#ff4444',
-            fontSize: '14px'
-          }}>
+          <div
+            style={{
+              padding: "12px",
+              marginBottom: "16px",
+              backgroundColor: "rgba(255, 68, 68, 0.1)",
+              border: "1px solid rgba(255, 68, 68, 0.3)",
+              borderRadius: "8px",
+              color: "#ff4444",
+              fontSize: "14px",
+            }}
+          >
             ⚠️ {audioError}
           </div>
         )}
@@ -263,7 +274,9 @@ function App() {
           {songs.map((song, index) => (
             <div
               key={song.id}
-              className={`song-item ${index === currentSongIndex ? 'active' : ''}`}
+              className={`song-item ${
+                index === currentSongIndex ? "active" : ""
+              }`}
               onClick={() => playSong(index)}
             >
               <img
@@ -271,8 +284,12 @@ function App() {
                 alt={song.title}
                 className="song-album-art"
                 onError={(e) => {
-                  console.error('Album art failed to load:', song.title, song.albumArtFileId);
-                  e.target.style.display = 'none';
+                  console.error(
+                    "Album art failed to load:",
+                    song.title,
+                    song.albumArtFileId
+                  );
+                  e.target.style.display = "none";
                 }}
               />
               <div className="song-info">
@@ -298,7 +315,7 @@ function App() {
               alt={currentSong.title}
               className="player-album-art"
               onError={(e) => {
-                e.target.style.display = 'none';
+                e.target.style.display = "none";
               }}
             />
             <div className="player-song-info">
@@ -310,23 +327,30 @@ function App() {
           {/* Controls */}
           <div className="player-controls">
             <button
-              className={`control-btn ${isShuffle ? 'active' : ''}`}
+              className={`control-btn ${isShuffle ? "active" : ""}`}
               onClick={() => setIsShuffle(!isShuffle)}
               title="Shuffle"
             >
               <span className="icon">🔀</span>
             </button>
-            <button className="control-btn" onClick={handlePrevious} title="Previous">
+            <button
+              className="control-btn"
+              onClick={handlePrevious}
+              title="Previous"
+            >
               <span className="icon">⏮️</span>
             </button>
-            <button className="control-btn play-pause" onClick={togglePlayPause}>
-              <span className="icon">{isPlaying ? '⏸️' : '▶️'}</span>
+            <button
+              className="control-btn play-pause"
+              onClick={togglePlayPause}
+            >
+              <span className="icon">{isPlaying ? "⏸️" : "▶️"}</span>
             </button>
             <button className="control-btn" onClick={handleNext} title="Next">
               <span className="icon">⏭️</span>
             </button>
             <button
-              className={`control-btn ${isRepeat ? 'active' : ''}`}
+              className={`control-btn ${isRepeat ? "active" : ""}`}
               onClick={() => setIsRepeat(!isRepeat)}
               title="Repeat"
             >
@@ -355,7 +379,7 @@ function App() {
           {/* Volume Control */}
           <div className="volume-control">
             <span className="volume-icon" onClick={toggleMute}>
-              {isMuted || volume === 0 ? '🔇' : volume < 0.5 ? '🔉' : '🔊'}
+              {isMuted || volume === 0 ? "🔇" : volume < 0.5 ? "🔉" : "🔊"}
             </span>
             <div className="volume-slider" onClick={handleVolumeChange}>
               <div
