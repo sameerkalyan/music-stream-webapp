@@ -15,45 +15,61 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [audioError, setAudioError] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true); // NEW: Loading animation state
 
   const audioRef = useRef(null);
   const progressBarRef = useRef(null);
 
-  // Load songs from JSON
+  // Load songs from JSON with image preloading
   useEffect(() => {
     fetch(`${process.env.PUBLIC_URL}/songs.json`)
       .then((response) => response.json())
       .then((data) => {
         setSongs(data);
         setLoading(false);
+
+        // Preload album art images
+        const imagePromises = data.map((song) => {
+          return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve();
+            img.onerror = () => resolve();
+            img.src = song.albumArtFileId;
+          });
+        });
+
+        // Wait for images, then show vinyl for 5 seconds
+        Promise.all(imagePromises).then(() => {
+          setTimeout(() => {
+            setIsInitialLoading(false); // This will trigger CSS fade-out
+          }, 3000); // 5 seconds
+        });
       })
       .catch((err) => {
         setError("Failed to load songs");
         setLoading(false);
+        setIsInitialLoading(false);
       });
   }, []);
 
-  // Get play count for a song
   const getPlayCount = (songId) => {
     const counts = JSON.parse(localStorage.getItem("playCounts") || "{}");
     return counts[songId] || 0;
   };
 
-  // Save play count
   const incrementPlayCount = (songId) => {
     const counts = JSON.parse(localStorage.getItem("playCounts") || "{}");
     counts[songId] = (counts[songId] || 0) + 1;
     localStorage.setItem("playCounts", JSON.stringify(counts));
   };
 
-  // Load theme from localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") || "dark";
     setTheme(savedTheme);
     document.documentElement.setAttribute("data-theme", savedTheme);
   }, []);
 
-  // Toggle theme
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
@@ -61,7 +77,6 @@ function App() {
     document.documentElement.setAttribute("data-theme", newTheme);
   };
 
-  // Audio event listeners
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -71,11 +86,8 @@ function App() {
     const handleEnded = () => handleNext();
     const handleError = (e) => {
       console.error("Audio error:", e);
-      const errorMsg = audio.error
-        ? `Error code: ${audio.error.code}`
-        : "Unknown error";
       setAudioError(
-        `Failed to load audio. ${errorMsg}. Check if files are accessible.`
+        "Unable to play audio. Make sure your files are accessible."
       );
       setIsPlaying(false);
     };
@@ -83,16 +95,12 @@ function App() {
       setAudioError(null);
       console.log("Audio loaded successfully");
     };
-    const handleLoadStart = () => {
-      console.log("Loading audio from:", audio.currentSrc);
-    };
 
     audio.addEventListener("timeupdate", updateTime);
     audio.addEventListener("loadedmetadata", updateDuration);
     audio.addEventListener("ended", handleEnded);
     audio.addEventListener("error", handleError);
     audio.addEventListener("canplay", handleCanPlay);
-    audio.addEventListener("loadstart", handleLoadStart);
 
     return () => {
       audio.removeEventListener("timeupdate", updateTime);
@@ -100,11 +108,9 @@ function App() {
       audio.removeEventListener("ended", handleEnded);
       audio.removeEventListener("error", handleError);
       audio.removeEventListener("canplay", handleCanPlay);
-      audio.removeEventListener("loadstart", handleLoadStart);
     };
   }, [currentSongIndex, isRepeat, isShuffle, songs]);
 
-  // Play/Pause toggle
   const togglePlayPause = () => {
     const audio = audioRef.current;
     if (isPlaying) {
@@ -129,7 +135,6 @@ function App() {
     }
   };
 
-  // Next song
   const handleNext = () => {
     if (isRepeat) {
       audioRef.current.currentTime = 0;
@@ -149,7 +154,6 @@ function App() {
     setCurrentTime(0);
   };
 
-  // Previous song
   const handlePrevious = () => {
     if (currentTime > 3) {
       audioRef.current.currentTime = 0;
@@ -162,7 +166,6 @@ function App() {
     }
   };
 
-  // Seek
   const handleProgressClick = (e) => {
     const bounds = progressBarRef.current.getBoundingClientRect();
     const percent = (e.clientX - bounds.left) / bounds.width;
@@ -171,7 +174,6 @@ function App() {
     setCurrentTime(newTime);
   };
 
-  // Volume control
   const handleVolumeChange = (e) => {
     const bounds = e.currentTarget.getBoundingClientRect();
     const percent = (e.clientX - bounds.left) / bounds.width;
@@ -181,7 +183,6 @@ function App() {
     setIsMuted(newVolume === 0);
   };
 
-  // Mute toggle
   const toggleMute = () => {
     if (isMuted) {
       audioRef.current.volume = volume;
@@ -192,7 +193,6 @@ function App() {
     }
   };
 
-  // Format time
   const formatTime = (time) => {
     if (isNaN(time)) return "0:00";
     const minutes = Math.floor(time / 60);
@@ -200,7 +200,6 @@ function App() {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  // Play specific song
   const playSong = (index) => {
     setCurrentSongIndex(index);
     setIsPlaying(true);
@@ -208,7 +207,6 @@ function App() {
     setAudioError(null);
   };
 
-  // Auto-load and play when song changes
   useEffect(() => {
     if (songs.length > 0 && audioRef.current) {
       audioRef.current.load();
@@ -244,9 +242,22 @@ function App() {
 
   return (
     <div className="app">
+      {/* Vinyl Loading Screen */}
+      {isInitialLoading && (
+        <div className="loading-screen">
+          <div style={{ position: "relative" }}>
+            <div className="vinyl-disc">
+              <div className="vinyl-grooves"></div>
+            </div>
+            <div className="tonearm"></div>
+          </div>
+          <div className="loading-text">Loading Music</div>
+        </div>
+      )}
+
       {/* Header */}
       <header className="header">
-        <h1>Warduna Trayaksha</h1>
+        <h1 className="style-grunge">tryza mixes</h1>
         <button className="theme-toggle" onClick={toggleTheme}>
           {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
         </button>
@@ -284,11 +295,7 @@ function App() {
                 alt={song.title}
                 className="song-album-art"
                 onError={(e) => {
-                  console.error(
-                    "Album art failed to load:",
-                    song.title,
-                    song.albumArtFileId
-                  );
+                  console.error("Album art failed to load:", song.title);
                   e.target.style.display = "none";
                 }}
               />
@@ -305,10 +312,9 @@ function App() {
         </div>
       </main>
 
-      {/* Audio Player */}
-      <div className="player">
+      {/* Mini Player (Bottom Bar) */}
+      <div className="player" onClick={() => setIsExpanded(true)}>
         <div className="player-main">
-          {/* Now Playing Info */}
           <div className="player-info">
             <img
               src={currentSong.albumArtFileId}
@@ -324,46 +330,66 @@ function App() {
             </div>
           </div>
 
-          {/* Controls */}
           <div className="player-controls">
             <button
               className={`control-btn ${isShuffle ? "active" : ""}`}
-              onClick={() => setIsShuffle(!isShuffle)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsShuffle(!isShuffle);
+              }}
               title="Shuffle"
             >
               <span className="icon">🔀</span>
             </button>
             <button
               className="control-btn"
-              onClick={handlePrevious}
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePrevious();
+              }}
               title="Previous"
             >
               <span className="icon">⏮️</span>
             </button>
             <button
               className="control-btn play-pause"
-              onClick={togglePlayPause}
+              onClick={(e) => {
+                e.stopPropagation();
+                togglePlayPause();
+              }}
             >
               <span className="icon">{isPlaying ? "⏸️" : "▶️"}</span>
             </button>
-            <button className="control-btn" onClick={handleNext} title="Next">
+            <button
+              className="control-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNext();
+              }}
+              title="Next"
+            >
               <span className="icon">⏭️</span>
             </button>
             <button
               className={`control-btn ${isRepeat ? "active" : ""}`}
-              onClick={() => setIsRepeat(!isRepeat)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsRepeat(!isRepeat);
+              }}
               title="Repeat"
             >
               <span className="icon">🔁</span>
             </button>
           </div>
 
-          {/* Progress Bar */}
           <div className="progress-container">
             <div
               className="progress-bar"
               ref={progressBarRef}
-              onClick={handleProgressClick}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleProgressClick(e);
+              }}
             >
               <div
                 className="progress-fill"
@@ -376,12 +402,23 @@ function App() {
             </div>
           </div>
 
-          {/* Volume Control */}
           <div className="volume-control">
-            <span className="volume-icon" onClick={toggleMute}>
+            <span
+              className="volume-icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleMute();
+              }}
+            >
               {isMuted || volume === 0 ? "🔇" : volume < 0.5 ? "🔉" : "🔊"}
             </span>
-            <div className="volume-slider" onClick={handleVolumeChange}>
+            <div
+              className="volume-slider"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleVolumeChange(e);
+              }}
+            >
               <div
                 className="volume-fill"
                 style={{ width: `${isMuted ? 0 : volume * 100}%` }}
@@ -391,8 +428,104 @@ function App() {
         </div>
       </div>
 
-      {/* Audio Element */}
-      <audio ref={audioRef} preload="metadata" crossOrigin="anonymous">
+      {/* Expanded Full-Screen Player */}
+      {isExpanded && (
+        <div className={`expanded-player ${isExpanded ? "visible" : ""}`}>
+          <div className="expanded-header">
+            <button className="close-btn" onClick={() => setIsExpanded(false)}>
+              <span className="icon">▼</span>
+            </button>
+            <div className="expanded-title">Now Playing</div>
+            <div className="expanded-placeholder"></div>
+          </div>
+
+          <div className="expanded-content">
+            <div className="expanded-album-art-container">
+              <img
+                src={currentSong.albumArtFileId}
+                alt={currentSong.title}
+                className="expanded-album-art"
+                onError={(e) => {
+                  e.target.style.backgroundColor = "var(--bg-tertiary)";
+                }}
+              />
+            </div>
+
+            <div className="expanded-song-info">
+              <div className="expanded-song-title">{currentSong.title}</div>
+              <div className="expanded-song-artist">{currentSong.artist}</div>
+            </div>
+
+            <div className="expanded-progress-container">
+              <div
+                className="expanded-progress-bar"
+                onClick={handleProgressClick}
+                ref={progressBarRef}
+              >
+                <div
+                  className="expanded-progress-fill"
+                  style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
+                />
+                <div
+                  className="expanded-progress-thumb"
+                  style={{ left: `${(currentTime / duration) * 100 || 0}%` }}
+                />
+              </div>
+              <div className="expanded-progress-time">
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(duration)}</span>
+              </div>
+            </div>
+
+            <div className="expanded-controls">
+              <button
+                className={`expanded-control-btn ${isShuffle ? "active" : ""}`}
+                onClick={() => setIsShuffle(!isShuffle)}
+              >
+                <span className="icon">🔀</span>
+              </button>
+              <button className="expanded-control-btn" onClick={handlePrevious}>
+                <span className="icon-large">⏮️</span>
+              </button>
+              <button
+                className="expanded-control-btn-play"
+                onClick={togglePlayPause}
+              >
+                <span className="icon-xlarge">{isPlaying ? "⏸️" : "▶️"}</span>
+              </button>
+              <button className="expanded-control-btn" onClick={handleNext}>
+                <span className="icon-large">⏭️</span>
+              </button>
+              <button
+                className={`expanded-control-btn ${isRepeat ? "active" : ""}`}
+                onClick={() => setIsRepeat(!isRepeat)}
+              >
+                <span className="icon">🔁</span>
+              </button>
+            </div>
+
+            <div className="expanded-volume-control">
+              <span className="volume-icon" onClick={toggleMute}>
+                {isMuted || volume === 0 ? "🔇" : volume < 0.5 ? "🔉" : "🔊"}
+              </span>
+              <div
+                className="expanded-volume-slider"
+                onClick={handleVolumeChange}
+              >
+                <div
+                  className="expanded-volume-fill"
+                  style={{ width: `${isMuted ? 0 : volume * 100}%` }}
+                />
+              </div>
+              <span className="volume-percentage">
+                {Math.round(isMuted ? 0 : volume * 100)}%
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <audio ref={audioRef} preload="metadata">
         <source src={currentSong.audioFileId} type="audio/mpeg" />
         Your browser does not support the audio element.
       </audio>
