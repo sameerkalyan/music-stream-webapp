@@ -257,7 +257,7 @@ function App() {
 
       {/* Header */}
       <header className="header">
-        <h1 className="style-grunge">tryza mixes</h1>
+        <h1>tryza mixes</h1>
         <button className="theme-toggle" onClick={toggleTheme}>
           {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
         </button>
