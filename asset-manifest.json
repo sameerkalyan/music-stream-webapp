@@ -1,13 +1,14 @@
 {
   "files": {
-    "main.css": "/music-stream-webapp/static/css/main.61c7e28e.css",
-    "main.js": "/music-stream-webapp/static/js/main.4ee12141.js",
+    "main.css": "/music-stream-webapp/static/css/main.f5220ac0.css",
+    "main.js": "/music-stream-webapp/static/js/main.27a6322c.js",
+    "static/media/Apestron.ttf": "/music-stream-webapp/static/media/Apestron.c9861a87218081e37c24.ttf",
     "index.html": "/music-stream-webapp/index.html",
-    "main.61c7e28e.css.map": "/music-stream-webapp/static/css/main.61c7e28e.css.map",
-    "main.4ee12141.js.map": "/music-stream-webapp/static/js/main.4ee12141.js.map"
+    "main.f5220ac0.css.map": "/music-stream-webapp/static/css/main.f5220ac0.css.map",
+    "main.27a6322c.js.map": "/music-stream-webapp/static/js/main.27a6322c.js.map"
   },
   "entrypoints": [
-    "static/css/main.61c7e28e.css",
-    "static/js/main.4ee12141.js"
+    "static/css/main.f5220ac0.css",
+    "static/js/main.27a6322c.js"
   ]
 }
