@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "title": "god Of delusional complex",
+    "title": "god of delusional complex",
     "artist": "Warduna Trayaksha",
     "audioFileId": "https://pub-902c7f8359bf4e459071e81d900969f4.r2.dev/god%20of%20delusional%20complex.mp3",
     "albumArtFileId": "https://pub-902c7f8359bf4e459071e81d900969f4.r2.dev/IMG-20251229-WA0015.jpg"
@@ -12,5 +12,12 @@
     "artist": "Warduna Trayaksha",
     "audioFileId": "https://pub-902c7f8359bf4e459071e81d900969f4.r2.dev/music2doblackmagic.mp3",
     "albumArtFileId": "https://pub-902c7f8359bf4e459071e81d900969f4.r2.dev/IMG_20251230_204724.jpg"
+  },
+  {
+    "id": 3,
+    "title": "nothing speaking forever",
+    "artist": "Warduna Trayaksha",
+    "audioFileId": "https://pub-902c7f8359bf4e459071e81d900969f4.r2.dev/jazz%20deconstructed.mp3",
+    "albumArtFileId": "https://pub-902c7f8359bf4e459071e81d900969f4.r2.dev/nothing_speaking_forever_art.jpg"
   }
 ]

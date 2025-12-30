@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/music-stream-webapp/static/css/main.8fe1d0a7.css",
-    "main.js": "/music-stream-webapp/static/js/main.09068349.js",
+    "main.css": "/music-stream-webapp/static/css/main.61c7e28e.css",
+    "main.js": "/music-stream-webapp/static/js/main.4ee12141.js",
     "index.html": "/music-stream-webapp/index.html",
-    "main.8fe1d0a7.css.map": "/music-stream-webapp/static/css/main.8fe1d0a7.css.map",
-    "main.09068349.js.map": "/music-stream-webapp/static/js/main.09068349.js.map"
+    "main.61c7e28e.css.map": "/music-stream-webapp/static/css/main.61c7e28e.css.map",
+    "main.4ee12141.js.map": "/music-stream-webapp/static/js/main.4ee12141.js.map"
   },
   "entrypoints": [
-    "static/css/main.8fe1d0a7.css",
-    "static/js/main.09068349.js"
+    "static/css/main.61c7e28e.css",
+    "static/js/main.4ee12141.js"
   ]
 }
