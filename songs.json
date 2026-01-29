@@ -19,5 +19,26 @@
     "artist": "warduna trayaksha",
     "audioFileId": "https://pub-902c7f8359bf4e459071e81d900969f4.r2.dev/jazz%20deconstructed.mp3",
     "albumArtFileId": "https://pub-902c7f8359bf4e459071e81d900969f4.r2.dev/nothing_speaking_forever_art.jpg"
+  },
+  {
+    "id": 4,
+    "title": "mornings with her",
+    "artist": "warduna trayaksha",
+    "audioFileId": "https://pub-902c7f8359bf4e459071e81d900969f4.r2.dev/mornings%20with%20her.mp3",
+    "albumArtFileId": "https://pub-902c7f8359bf4e459071e81d900969f4.r2.dev/mornings_with_her_cover.jpg"
+  },
+  {
+    "id": 5,
+    "title": "cats high on coke",
+    "artist": "warduna trayaksha",
+    "audioFileId": "https://pub-902c7f8359bf4e459071e81d900969f4.r2.dev/cats%20high%20on%20coke.mp3",
+    "albumArtFileId": "https://pub-902c7f8359bf4e459071e81d900969f4.r2.dev/cats_high_on_coke.jpg"
+  },
+  {
+    "id": 6,
+    "title": "ghosts of gods around me",
+    "artist": "warduna trayaksha",
+    "audioFileId": "https://pub-902c7f8359bf4e459071e81d900969f4.r2.dev/cats%20high%20on%20coke.mp3",
+    "albumArtFileId": "https://pub-902c7f8359bf4e459071e81d900969f4.r2.dev/cats_high_on_coke.jpg"
   }
 ]
